@@ -1,0 +1,9 @@
+{
+    "recommendations": [
+        "github.vscode-pull-request-github",
+        "waderyan.nodejs-extension-pack",
+        "xabikos.javascriptsnippets",
+        "icrawl.discord-vscode",
+        "aaron-bond.better-comments"
+    ]
+}
