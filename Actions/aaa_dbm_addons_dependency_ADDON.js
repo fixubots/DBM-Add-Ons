@@ -3,7 +3,7 @@
 *   Author: ACertainCoder                                                                                                                       *
 *   Contributors: None                                                                                                                          *
 *   Description: This is the main Add-On which is required to run all other DBM Add-Ons.                                                        *
-*   Version: alpha                                                                                                                              *
+*   Version: beta                                                                                                                              *
 \***********************************************************************************************************************************************/
 const child_process = require("child_process");
 const util = require("util");
@@ -22,7 +22,7 @@ AddOns.events = []; //Custom events of DBM Add-Ons
 AddOns.short_description = "The main Add-On which overwrites some parts of the bot and gives all other Add-Ons access to needed functions.";
 AddOns.description = "What is this? Very simple!\nThis mod (dependency) overwrites some parts of the bot and gives all other Add-Ons access to functions which those need in order to run properly.\nYou can access these functions too by using `this.getAddOns()` in Run Script or the action you're currently looking at.";
 
-AddOns.version = "alpha";
+AddOns.version = "beta";
 AddOns.settings = null;
 AddOns.defaults = {
     "enableAddOns": true,           //Enable the Add-Ons dependency
