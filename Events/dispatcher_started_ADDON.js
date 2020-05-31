@@ -9,6 +9,26 @@ module.exports = {
 name: "Dispatcher started",
 
 //---------------------------------------------------------------------
+// DBM Add-Ons Infos (Optional)
+//
+// These are the informations about this Add-On.
+//---------------------------------------------------------------------
+
+// Who made the Add-On
+author: "ACertainCoder",
+
+// Who contributed to the Add-On
+contributors: [],
+
+// The version of the Add-On (Default: 1.0.0)
+version: "1.0.0",
+
+// A short description for this Add-On
+short_description: "Triggers when a dispatchers starts.",
+
+//---------------------------------------------------------------------
+
+//---------------------------------------------------------------------
 // Is Event
 //
 // Must be true for this to be an event.
@@ -22,7 +42,7 @@ isEvent: true,
 // The variables associated with this event. Can only have 0, 1, or 2.
 //---------------------------------------------------------------------
 
-fields: ["Item Type", "Options (Object)", "Item URL"],
+fields: ["Started Item:"],
 
 //---------------------------------------------------------------------
 // Action Bot Mod
@@ -52,9 +72,11 @@ mod: function(DBM) {
             const server = Bot.bot.guilds.get(id);
             const temp = {};
 
-            if(event.temp) temp[event.temp] = item[0];
-            if(event.temp2) temp[event.temp2] = item[1];
-            if(event.temp3) temp[event.temp3] = item[2];
+            if(event.temp) temp[event.temp] = {
+                "type": item[0],
+                "options": item[1],
+                "url": item[2]
+            };
 
             Actions.invokeEvent(event, server, temp);
         }

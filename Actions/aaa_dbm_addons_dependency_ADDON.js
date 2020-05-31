@@ -269,7 +269,7 @@ AddOns.require = function(nodeModuleName) {
     if(!this.checkNodeModule(nodeModuleName)) {
         this.installNodeModule(nodeModuleName);
     } else {
-        return nodeModule;
+        return require(nodeModuleName);
     }
 }
 
@@ -578,7 +578,7 @@ AddOns.overwriteBotFunctions = function(DBM) {
                         this.playNext(id);
                     }
 
-                    DBM.Bot.bot.emit('DispatcherStop', item, id);
+                    DBM.Bot.bot.emit('DispatcherStop', item, id, error);
                 }.bind(this));
 
                 this.dispatchers[id] = dispatcher;
