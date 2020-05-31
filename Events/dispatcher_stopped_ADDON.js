@@ -61,8 +61,8 @@ fields: ["Stopped Item:", "Forced Stop:"],
 //---------------------------------------------------------------------
 
 mod: function(DBM) {
-    DBM.Events.onDispatcherStop = function(item, id, error) {
-        console.log('called');
+    const AddOns = DBM.Actions.getAddOns();
+    const onDispatcherStop = function(item, id, error) {
         const { Bot, Actions } = DBM;
         const events = Bot.$evts[module.exports.name];
 
@@ -83,6 +83,12 @@ mod: function(DBM) {
             Actions.invokeEvent(event, server, temp);
         }
     }
+
+    AddOns.events.push({
+        "trigger": "DispatcherStop",
+        "arguments": 3,
+        "callback": onDispatcherStop
+    });
 }
 
 }; // End of module

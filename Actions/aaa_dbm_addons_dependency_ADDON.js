@@ -17,6 +17,8 @@ AddOns.section = "DBM Add-Ons";
 AddOns.author = "ACertainCoder";
 AddOns.contributors = [];
 
+AddOns.events = []; //Custom events of DBM Add-Ons
+
 AddOns.short_description = "The main Add-On which overwrites some parts of the bot and gives all other Add-Ons access to needed functions.";
 AddOns.description = "What is this? Very simple!\nThis mod (dependency) overwrites some parts of the bot and gives all other Add-Ons access to functions which those need in order to run properly.\nYou can access these functions too by using `this.getAddOns()` in Run Script or the action you're currently looking at.";
 
@@ -309,6 +311,26 @@ AddOns.requireNodeModules = function(DBM) {
     }
 }
 
+/**
+ * Require all used Node-Modules
+ * @param DBM Discord Bot Maker
+ */
+AddOns.registerCustomEvents = function(DBM) {
+    for(var i = 0; i < this.events.length; i++) {
+        let event = this.events[i];
+
+        DBM.Bot.bot.on(event.trigger, function() {
+            var args = [];
+
+            for(var j = 0; j < event.arguments; j++) {
+                args.push(arguments[j]);
+            }
+
+            event.callback(...args);
+        });
+    }
+}
+
 //Overwrite Bot Functions
 //-----------------------------------------------------------------------------------------------------------------------------------------------
 
@@ -338,21 +360,7 @@ AddOns.overwriteBotFunctions = function(DBM) {
         DBM.Bot.setupBot = function() {
             this.bot.on('raw', this.onRawData);
             this.bot.on('error', this.onError);
-            this.bot.on('DispatcherStart', function() {
-                if(typeof DBM.Events.onDispatcherStart == 'function') {
-                    const item = arguments[0];
-                    const id = arguments[1];
-                    DBM.Events.onDispatcherStart(item, id);
-                }
-            });
-            this.bot.on('DispatcherStop', function() {
-                if(typeof DBM.Events.onDispatcherStop == 'function') {
-                    const item = arguments[0];
-                    const id = arguments[1];
-                    const error = arguments[2];
-                    DBM.Events.onDispatcherStop(item, id, error);
-                }
-            });
+            AddOns.registerCustomEvents(DBM);
         }
     }
 
@@ -643,7 +651,7 @@ module.exports = {
     version: AddOns.version,
     short_description: AddOns.short_description,
 	description: AddOns.description,
-    node_modules: [],
+    node_modules: [], //Required Node-Modules
 
     requiresAudioLibraries: true,
     commandOnly: false,
