@@ -41,10 +41,11 @@ AddOns.defaults = {
         "bitrate": null
     }
 };
+//TODO "enableMentionPrefix"
 //TODO Add YouTube playlists & directories to AutoPlay
-//TODO DBM crack check (process.env)
+//TODO DBM crack check? (process.env)
 //TODO DBM version check (DBM.version)
-//TODO Constants
+//TODO Constants?
 //TODO Being able to edit the text of the time restriction
 //TODO Being able to exclude users of time restriction tests
 //TODO Saved cooldowns?
@@ -333,10 +334,7 @@ AddOns.overwriteBotFunctions = function(DBM) {
                 console.error(error);
             }
         }
-    }
 
-
-    if(AddOns.settings.reconnectAutomatically) {
         DBM.Bot.setupBot = function() {
             this.bot.on('raw', this.onRawData);
             this.bot.on('error', this.onError);
@@ -383,12 +381,15 @@ AddOns.overwriteBotFunctions = function(DBM) {
             const tag = DBM.Files.data.settings.tag;
             const prefix = msg.guild ? (this.prefixes[msg.guild.id] || tag) : tag;
             const separator = DBM.Files.data.settings.separator || '\\s+';
-            var content = msg.content.split(new RegExp(separator))[0];
-            if(content.startsWith(prefix)) {
-                return content.substring(prefix.length);
-            } else {
-                return null;
+
+            if(msg.content) {
+                var content = msg.content.split(new RegExp(separator))[0];
+                if(content.startsWith(prefix)) {
+                    return content.substring(prefix.length);
+                }
             }
+
+            return null;
         }
     }
 
@@ -567,6 +568,8 @@ AddOns.overwriteBotFunctions = function(DBM) {
                         AddOns.saveVolumes(this.volumes);
                     }
                     dispatcher.setVolumeLogarithmic(this.volumes[id]);
+
+                    DBM.Bot.bot.emit('DispatcherStart', item, id);
                 }.bind(this));
 
                 dispatcher.on('end', function(error) {
@@ -574,6 +577,8 @@ AddOns.overwriteBotFunctions = function(DBM) {
                     if(error != 'forced') {
                         this.playNext(id);
                     }
+
+                    DBM.Bot.bot.emit('DispatcherStop', item, id);
                 }.bind(this));
 
                 this.dispatchers[id] = dispatcher;
