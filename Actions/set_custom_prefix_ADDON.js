@@ -19,20 +19,20 @@ section: "Server Control",
 //---------------------------------------------------------------------
 // DBM Add-Ons Infos (Optional)
 //
-// These are the informations about this mod.
+// These are the informations about this Add-On.
 //---------------------------------------------------------------------
 
-// Who made the mod
+// Who made the Add-On
 author: "ACertainCoder",
 
-// Who contributed to the mod
+// Who contributed to the Add-On
 contributors: [],
 
-// The version of the mod (Default: 1.0.0)
+// The version of the Add-On (Default: 1.0.0)
 version: "1.0.0",
 
-// A short description for this mod
-short_description: "This mod will change the custom prefix for a server.",
+// A short description for this Add-On
+short_description: "This Add-On will change the custom prefix for a server.",
 
 //---------------------------------------------------------------------
 
