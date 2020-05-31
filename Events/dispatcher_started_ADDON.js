@@ -62,8 +62,9 @@ fields: ["Started Item:"],
 
 mod: function(DBM) {
     DBM.Events.onDispatcherStart = function(item, id) {
+        console.log('called');
         const { Bot, Actions } = DBM;
-        const events = Bot.$evts[this.name];
+        const events = Bot.$evts[module.exports.name];
 
         if(!events) return;
 
@@ -81,8 +82,6 @@ mod: function(DBM) {
             Actions.invokeEvent(event, server, temp);
         }
     }
-
-    DBM.Bot.bot.on('DispatcherStart', DBM.Events.onDispatcherStart);
 }
 
 }; // End of module

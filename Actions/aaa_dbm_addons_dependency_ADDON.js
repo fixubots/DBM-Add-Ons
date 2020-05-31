@@ -338,6 +338,21 @@ AddOns.overwriteBotFunctions = function(DBM) {
         DBM.Bot.setupBot = function() {
             this.bot.on('raw', this.onRawData);
             this.bot.on('error', this.onError);
+            this.bot.on('DispatcherStart', function() {
+                if(typeof DBM.Events.onDispatcherStart == 'function') {
+                    const item = arguments[0];
+                    const id = arguments[1];
+                    DBM.Events.onDispatcherStart(item, id);
+                }
+            });
+            this.bot.on('DispatcherStop', function() {
+                if(typeof DBM.Events.onDispatcherStop == 'function') {
+                    const item = arguments[0];
+                    const id = arguments[1];
+                    const error = arguments[2];
+                    DBM.Events.onDispatcherStop(item, id, error);
+                }
+            });
         }
     }
 
@@ -564,7 +579,7 @@ AddOns.overwriteBotFunctions = function(DBM) {
             if(dispatcher) {
                 dispatcher.on('start', function() {
                     if(typeof this.volumes[id] != 'number') {
-                        this.volumes[id] = volume;
+                        this.volumes[id] = (typeof volume == 'number' ? volume : 1);
                         AddOns.saveVolumes(this.volumes);
                     }
                     dispatcher.setVolumeLogarithmic(this.volumes[id]);
@@ -605,7 +620,8 @@ AddOns.overwriteBotFunctions = function(DBM) {
     DBM.Audio.playYt = function(url, options, id) {
         if(this.connections[id] && this.ytdl) {
             const stream = this.ytdl(url, {
-                filter: 'audioonly'
+                filter: 'audioonly',
+                quality: 'highestaudio'
             });
             return this.connections[id].playStream(stream, options);
         } else {

@@ -62,8 +62,9 @@ fields: ["Stopped Item:", "Forced Stop:"],
 
 mod: function(DBM) {
     DBM.Events.onDispatcherStop = function(item, id, error) {
+        console.log('called');
         const { Bot, Actions } = DBM;
-        const events = Bot.$evts[this.name];
+        const events = Bot.$evts[module.exports.name];
 
         if(!events) return;
 
@@ -82,8 +83,6 @@ mod: function(DBM) {
             Actions.invokeEvent(event, server, temp);
         }
     }
-
-    DBM.Bot.bot.on('DispatcherStop', DBM.Events.onDispatcherStop);
 }
 
 }; // End of module
