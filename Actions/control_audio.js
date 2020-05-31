@@ -6,7 +6,7 @@ module.exports = {
 // This is the name of the action displayed in the editor.
 //---------------------------------------------------------------------
 
-name: "Remove Item from AutoPlay",
+name: "Control Audio",
 
 //---------------------------------------------------------------------
 // Action Section
@@ -32,7 +32,7 @@ contributors: [],
 version: "1.0.0",
 
 // A short description for this mod
-short_description: "Removes an item from AutoPlay",
+short_description: "Controls the audio player.",
 
 //---------------------------------------------------------------------
 
@@ -43,21 +43,8 @@ short_description: "Removes an item from AutoPlay",
 //---------------------------------------------------------------------
 
 subtitle: function(data) {
-	const itemTypes = ['file', 'url', 'yt'];
-
-	return `Remove ${itemTypes[parseInt(data.itemType)]} "${data.url}"`;
-},
-
-//---------------------------------------------------------------------
-// Action Storage Function
-//
-// Stores the relevant variable info for the editor.
-//---------------------------------------------------------------------
-
-variableStorage: function(data, varType) {
-	const type = parseInt(data.storage);
-	if(type !== varType) return;
-	return ([data.varName, 'Boolean']);
+	const changes = (parseInt(data.item) || 0) + (parseInt(data.loopItem) || 0) + (parseInt(data.loopQueue) || 0) + (parseInt(autoplay) || 0);
+	return `Change ${changes} settings`;
 },
 
 //---------------------------------------------------------------------
@@ -68,7 +55,7 @@ variableStorage: function(data, varType) {
 // are also the names of the fields stored in the action's JSON data.
 //---------------------------------------------------------------------
 
-fields: ["itemType", "url", "storage", "varName"],
+fields: ["item", "loopItem", "loopQueue", "autoplay"],
 
 //---------------------------------------------------------------------
 // Command HTML
@@ -88,30 +75,39 @@ fields: ["itemType", "url", "storage", "varName"],
 
 html: function(isEvent, data) {
 	return `
-<div style="float: left; width: 35%;">
-	Item Type:<br>
-	<select id="itemType" class="round" onchange="glob.onChange(this)">
-		<option value="0" selected>File</option>
-		<option value="1">URL</option>
-		<option value="2">YouTube Video</option>
-	</select>
+<div style="float: left; width: 45%;">
+	Currently playing Item:<br>
+	<select id="item" class="round">
+		<option value="0" selected>Unchanged</option>
+		<option value="1">Stop</option>
+		<option value="2">Pause</option>
+		<option value="3">Resume</option>
+	</select><br>
 </div>
-<div style="float: right; width: 60%;">
-	<span id="type">URL</span>:<br>
-	<input id="url" class="round" type="text"><br>
-</div><br><br><br>
-<div style="padding-top: 8px;">
-	<div style="float: left; width: 35%;">
-		Store Success In:<br>
-		<select id="storage" class="round" onchange="glob.variableChange(this, 'varNameContainer')">
-			${data.variables[0]}
-		</select>
-	</div>
-	<div id="varNameContainer" style="display: none; float: right; width: 60%;">
-		Variable Name:<br>
-		<input id="varName" class="round" type="text">
-	</div>
-</div>`
+<div style="float: right; width: 45%;">
+	Loop Item:<br>
+	<select id="loopItem" class="round">
+		<option value="0" selected>Unchanged</option>
+		<option value="1">Enable</option>
+		<option value="2">Disable</option>
+	</select><br>
+</div>
+<div style="float: left; width: 45%;">
+	Loop Queue:<br>
+	<select id="loopQueue" class="round">
+		<option value="0" selected>Unchanged</option>
+		<option value="1">Enable</option>
+		<option value="2">Disable</option>
+	</select><br>
+</div>
+<div style="float: right; width: 45%;">
+	AutoPlay:<br>
+	<select id="autoplay" class="round">
+		<option value="0" selected>Unchanged</option>
+		<option value="1">Enable</option>
+		<option value="2">Disable</option>
+	</select><br>
+</div>`;
 },
 
 //---------------------------------------------------------------------
@@ -123,20 +119,6 @@ html: function(isEvent, data) {
 //---------------------------------------------------------------------
 
 init: function() {
-	const {glob, document} = this;
-
-	glob.onChange = function(event) {
-		const value = parseInt(event.value);
-		const type = document.getElementById('type').innerHTML;
-		
-		if(value > 0) {
-			type = 'URL';
-		} else {
-			type = 'Path';
-		}
-	}
-
-	glob.variableChange(document.getElementById('storage'), 'varNameContainer');
 },
 
 //---------------------------------------------------------------------
@@ -149,30 +131,59 @@ init: function() {
 
 action: function(cache) {
 	const data = cache.actions[cache.index];
-	const AddOns = this.getAddOns();
 	const Audio = this.getDBM().Audio;
-	const itemTypes = ['file', 'url', 'yt'];
-	const itemType = itemTypes[parseInt(data.itemType)];
-	const url = this.evalMessage(data.url, cache);
+	const server = cache.server;
+	const item = parseInt(data.item);
+	const loopItem = parseInt(data.loopItem);
+	const shuffleQueue = parseInt(data.shuffleQueue);
+	const loopQueue = parseInt(data.loopQueue);
+	const autoplay = parseInt(data.autoplay);
 
-	var item = null;
-	var success = false;
-	for(var i = 0; i < Audio.autoplaydata.length; i++) {
-		item = Audio.autoplaydata[i];
-
-		if(item[0] == itemType && item[1] == url) {
-			Audio.autoplaydata.splice(i, 1);
-			success = true;
-			break;
-		}
+	var dispatcher = null;
+	if(server) {
+		dispatcher = Audio.dispatchers[server.id];
 	}
 
-	AddOns.saveAutoPlay(Audio.autoplaydata);
+	if(dispatcher) {
+		switch(item) {
+			case 1://Stop
+				dispatcher.end('forced');
+				break;
+			case 2://Pause
+				dispatcher.pause();
+				break;
+			case 3://Resume
+				dispatcher.resume();
+				break;
+		}
 
-	const varName = this.evalMessage(data.varName, cache);
-	const storage = parseInt(data.storage);
-	this.storeValue(success, storage, varName, cache);
+		//Loop Item
+		if(loopItem == 1) {
+			//Enable
+			Audio.loopitem[server.id] = true;
+		} else if(loopItem == 2) {
+			//Disable
+			Audio.loopitem[server.id] = false;
+		}
 
+		//Loop Queue
+		if(loopQueue == 1) {
+			//Enable
+			Audio.loopqueue[server.id] = true;
+		} else if(loopQueue == 2) {
+			//Disable
+			Audio.loopqueue[server.id] = false;
+		}
+
+		//AutoPlay
+		if(autoplay == 1) {
+			//Enable
+			Audio.autoplay[server.id] = true;
+		} else if(autoplay == 2) {
+			//Disable
+			Audio.autoplay[server.id] = false;
+		}
+	}
 	this.callNextAction(cache);
 },
 

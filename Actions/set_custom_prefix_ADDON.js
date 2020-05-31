@@ -89,11 +89,6 @@ fields: ["server", "varName", "prefix"],
 html: function (isEvent, data) {
 	return `
 <div>
-	<div>
-		<p>
-		Made by ${this.author}.
-		</p>
-	</div>
 	<div style="float: left; width: 35%;">
 		<br>Source Server:<br>
 		<select id="server" class="round" onchange="glob.serverChange(this, 'varNameContainer')">

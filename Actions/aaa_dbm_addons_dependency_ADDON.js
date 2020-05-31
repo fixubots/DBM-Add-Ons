@@ -41,7 +41,13 @@ AddOns.defaults = {
         "bitrate": null
     }
 };
+//TODO Add YouTube playlists & directories to AutoPlay
+//TODO DBM crack check (process.env)
 //TODO DBM version check (DBM.version)
+//TODO Constants
+//TODO Being able to edit the text of the time restriction
+//TODO Being able to exclude users of time restriction tests
+//TODO Saved cooldowns?
 
 //TODO Add Item to AutoPlay: even if it already exits?
 //TODO Remove Item from AutoPlay: first match / all matches?
@@ -78,22 +84,6 @@ AddOns.loadSettings = function(DBM) {
 
     this.checkSettings();
     this.saveSettings(DBM);
-
-    /*var settingspath = path.join(process.cwd(), "data", "addons_settings.json");
-
-    if(fs.existsSync(settingspath)) {
-        try {
-            this.settings = JSON.parse(fs.readFileSync(settingspath, "utf8"));
-        } catch(e) {
-            this.settings = this.defaults;
-        }
-        
-        if(this.settings.restoreDefaults) {
-            this.settings = this.defaults;
-        }
-    } else {
-        this.settings = this.defaults;
-    }*/
 }
 
 /**
@@ -121,12 +111,6 @@ AddOns.checkSettings = function() {
  */
 AddOns.saveSettings = function(DBM) {
     DBM.Files.saveData('settings');
-    
-    /*if(this.settings.saveSettings) {
-        var settingspath = path.join(process.cwd(), "data", "addons_settings.json");
-    
-        fs.writeFileSync(settingspath, JSON.stringify(this.settings, null, 4));
-    }*/
 }
 
 
@@ -304,7 +288,7 @@ AddOns.requireNodeModules = function(DBM) {
     }
 
     for(var i = 0; i < actions.length; i++) {
-        let nodeModules = actions[i].nodeModules;
+        let nodeModules = actions[i].node_modules;
 
         if(nodeModules instanceof Array && nodeModules.length > 0) {
             for(var j = 0; j < nodeModules.length; j++) {
@@ -637,10 +621,11 @@ module.exports = {
     author: `${AddOns.author}${AddOns.contributors.length ? ", " + AddOns.contributors.join(", ") : ""}`,
     version: AddOns.version,
     short_description: AddOns.short_description,
+	description: AddOns.description,
+    node_modules: [],
 
     requiresAudioLibraries: true,
     commandOnly: false,
-    nodeModules: [],
 
     subtitle: function(data) {
         return `Install "${data.module}"`;
