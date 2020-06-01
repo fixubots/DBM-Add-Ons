@@ -3,7 +3,7 @@
 *   Author: ACertainCoder                                                                                                                       *
 *   Contributors: None                                                                                                                          *
 *   Description: This is the main Add-On which is required to run all other DBM Add-Ons.                                                        *
-*   Version: beta                                                                                                                              *
+*   Version: beta                                                                                                                               *
 \***********************************************************************************************************************************************/
 const child_process = require("child_process");
 const util = require("util");
@@ -404,31 +404,51 @@ AddOns.overwriteBotFunctions = function(DBM) {
             this.prefixes[id] = prefix;
             AddOns.savePrefixes(this.prefixes);
         }
+    }
 
-        DBM.Bot.checkCommand = function(msg) {
-            var command = this.checkTag(msg);
-            if(command) {
-                if(!this._caseSensitive) {
-                    command = command.toLowerCase();
-                }
-                const cmd = this.$cmds[command];
-                if(cmd) {
-                    DBM.Actions.preformActions(msg, cmd);
-                    return true;
-                }
+    DBM.Bot.checkCommand = function(msg) {
+        var command = this.checkTag(msg) || (AddOns.settings.enableMentionPrefix ? this.checkMention(msg) : null);
+
+        if(command) {
+            if(!this._caseSensitive) {
+                command = command.toLowerCase();
             }
-            return false;
+            const cmd = this.$cmds[command];
+            if(cmd) {
+                DBM.Actions.preformActions(msg, cmd);
+                return true;
+            }
         }
-        
-        DBM.Bot.checkTag = function(msg) {
-            const tag = DBM.Files.data.settings.tag;
-            const prefix = msg.guild ? (this.prefixes[msg.guild.id] || tag) : tag;
+        return false;
+    }
+    
+    DBM.Bot.checkTag = function(msg) {
+        const tag = DBM.Files.data.settings.tag;
+        const prefix = AddOns.settings.enableCustomPrefixes && msg.guild ? (this.prefixes[msg.guild.id] || tag) : tag;
+        const separator = DBM.Files.data.settings.separator || '\\s+';
+
+        if(msg.content) {
+            var content = msg.content.split(new RegExp(separator))[0];
+            if(content.startsWith(prefix)) {
+                return content.substring(prefix.length);
+            }
+        }
+
+        return null;
+    }
+
+    if(this.settings.enableMentionPrefix) {
+        DBM.Bot.checkMention = function(msg) {
+            const mention = new RegExp(`^(<@!?${this.bot.user.id}>)`);
             const separator = DBM.Files.data.settings.separator || '\\s+';
 
             if(msg.content) {
-                var content = msg.content.split(new RegExp(separator))[0];
-                if(content.startsWith(prefix)) {
-                    return content.substring(prefix.length);
+                var args = msg.content.split(new RegExp(separator));
+                var matches = args[0].match(mention);
+                if(matches) {
+                    var content = msg.content.substring(matches[0].length).replace(/^\s+/, '');
+                    msg.content = matches[0] + content;
+                    return content.split(new RegExp(separator))[0];
                 }
             }
 
