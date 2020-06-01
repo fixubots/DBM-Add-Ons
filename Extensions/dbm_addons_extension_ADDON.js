@@ -32,7 +32,9 @@ settings: [
     "restoreDefaults",
     "saveSettings",
     "overwriteBotFunctions",
-    "installNodeModules", "saveVolumes",
+    "installNodeModules",
+    "saveVolumes",
+    "enableMentionPrefix",
     "enableCustomPrefixes",
     "ignoreBotMessages",
     "ignoreOwnMessages",
@@ -117,6 +119,7 @@ defaultFields: {
     overwriteBotFunctions: true,
     installNodeModules: true,
     saveVolumes: true,
+    enableMentionPrefix: true,
     enableCustomPrefixes: true,
     ignoreBotMessages: true,
     ignoreOwnMessages: true,
@@ -211,30 +214,38 @@ html: function(data) {
         </div>
 
         <div style="float: right; width: 280px">
-            Ignore bot messages:<br>
-            <select id="ignoreBotMessages" class="round" style="width: 90%">
+            Enable mention prefix:<br>
+            <select id="enableMentionPrefix" class="round" style="width: 90%">
                 <option value="0">Yes</option>
                 <option value="1">No</option>
             </select><br>
         </div><br><br><br>
 
         <div style="float: left; width: 280px">
-            Ignore own messages:<br>
-            <select id="ignoreOwnMessages" class="round" style="width: 90%">
+            Ignore bot messages:<br>
+            <select id="ignoreBotMessages" class="round" style="width: 90%">
                 <option value="0">Yes</option>
                 <option value="1">No</option>
             </select><br>
         </div>
 
         <div style="float: right; width: 280px">
-            Reconnect automatically:<br>
-            <select id="reconnectAutomatically" class="round" style="width: 90%">
+            Ignore own messages:<br>
+            <select id="ignoreOwnMessages" class="round" style="width: 90%">
                 <option value="0">Yes</option>
                 <option value="1">No</option>
             </select><br>
         </div><br><br><br>
 
-        <div style="float: left; width: 560px">
+        <div style="float: left; width: 280px">
+            Reconnect automatically:<br>
+            <select id="reconnectAutomatically" class="round" style="width: 90%">
+                <option value="0">Yes</option>
+                <option value="1">No</option>
+            </select><br>
+        </div>
+
+        <div style="float: right; width: 560px">
             Leave voice channels automatically:<br>
             <select id="leaveVCsAutomatically" class="round" style="width: 45%">
                 <option value="0">Yes</option>
