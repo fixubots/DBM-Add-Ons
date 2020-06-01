@@ -245,13 +245,14 @@ html: function(data) {
             </select><br>
         </div>
 
-        <div style="float: right; width: 560px">
+        <div style="float: right; width: 280px">
             Leave voice channels automatically:<br>
-            <select id="leaveVCsAutomatically" class="round" style="width: 45%">
+            <select id="leaveVCsAutomatically" class="round" style="width: 90%">
                 <option value="0">Yes</option>
                 <option value="1">No</option>
             </select><br>
         </div><br><br><br>
+        <!-- If only one last selection: 560px / 45% -->
 
 
         <div style="width: 100%; padding-top: 32px;">
