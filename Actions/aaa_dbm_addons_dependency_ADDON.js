@@ -20,7 +20,11 @@ AddOns.contributors = [];
 AddOns.events = []; //Custom events of DBM Add-Ons
 
 AddOns.short_description = "The main Add-On which overwrites some parts of the bot and gives all other Add-Ons access to needed functions.";
-AddOns.description = "What is this? Very simple!\nThis mod (dependency) overwrites some parts of the bot and gives all other Add-Ons access to functions which those need in order to run properly.\nYou can access these functions too by using `this.getAddOns()` in Run Script or the action you're currently looking at.";
+AddOns.description = [
+    "What is this? Very simple!",
+    "This mod (dependency) overwrites some parts of the bot and gives all other Add-Ons access to functions which those need in order to run properly.",
+    "You can access these functions too by using `this.getAddOns()` in Run Script or the action you're currently looking at."
+].join('\n'),
 
 AddOns.version = "beta";
 AddOns.settings = null;
@@ -682,9 +686,7 @@ module.exports = {
         <div style="width: 550px; height: 350px; overflow-y: scroll; overflow-x: hidden;">
             <div style="width: 100%;">
                 <h1>Add-Ons Dependency</h1>
-                What is this? Very simple!<br>
-                This mod (dependency) overwrites some parts of the bot and gives all other Add-Ons access to functions which those need in order to run properly.<br>
-                You can access these functions too by using <span class="embed">this.getAddOns()</span> in Run Script or the action you're currently looking at.
+                ${this.description.replace(/\n/g, '<br>').replace('`this.getAddOns()`', '<span class="embed">this.getAddOns()</span>')}
             </div>
             <div style="width: 100%; padding-top: 32px;">
                 <h2>NodeModules-Installer</h2>
