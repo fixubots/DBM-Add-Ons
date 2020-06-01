@@ -35,6 +35,7 @@ AddOns.defaults = {
     "overwriteBotFunctions": true,  //Overwrite functions inside of the bot
     "installNodeModules": true,     //Install Node-Modules that other Add-Ons need
     "saveVolumes": true,            //Saves the set volumes of each server                  | Requires "overwriteBotFunctions"
+    "enableMentionPrefix": true,    //Lets the bot trigger commands if it got mentioned     | Requires "overwriteBotFunctions"
     "enableCustomPrefixes": true,   //Lets the bot use different prefixes in each server    | Requires "overwriteBotFunctions"
     "ignoreBotMessages": true,      //Ignore messages sent by other bots                    | Requires "overwriteBotFunctions"
     "ignoreOwnMessages": true,      //Ignore messages sent by the bot itself                | Requires "overwriteBotFunctions"
@@ -47,7 +48,6 @@ AddOns.defaults = {
         "bitrate": null
     }
 };
-//TODO "enableMentionPrefix"
 //TODO Add YouTube playlists & directories to AutoPlay
 //TODO DBM crack check? (process.env)
 //TODO DBM version check (DBM.version)
@@ -71,6 +71,7 @@ AddOns.defaults = {
 
 /**
  * Load Add-Ons settings
+ * @param DBM Discord Bot Maker
  */
 AddOns.loadSettings = function(DBM) {
     if(DBM.Files.data.settings.modules["DBM Add-Ons Settings"]) {
@@ -100,21 +101,30 @@ AddOns.checkSettings = function() {
     var settingsMissing = Object.keys(this.defaults).filter(setting => this.settings[setting] === undefined || this.settings[setting] === null);
 
     if(settingsMissing.length > 0) {
-        console.log(`WARNING: ${settingsMissing.map(setting => `"${setting}"`).join(' & ')} are not set! Loading defaults...`);
+        console.log(`WARNING: ${settingsMissing.map((setting, i) => `"${setting}"`).join(i+1 == settingsMissing.length ? ' & ' : ', ')} are not set! Loading defaults...`);
         settingsMissing.forEach(setting => {
             this.settings[setting] = this.defaults[setting];
         });
     }
 
-    var overwriteBotFunctions = ["saveVolumes", "enableCustomPrefixes", "ignoreBotMessages", "ignoreOwnMessages", "reconnectAutomatically", "leaveVCsAutomatically"].filter(setting => this.settings[setting] != true);
+    var overwriteBotFunctions = [
+        "saveVolumes",
+        "enableMentionPrefix",
+        "enableCustomPrefixes",
+        "ignoreBotMessages",
+        "ignoreOwnMessages",
+        "reconnectAutomatically",
+        "leaveVCsAutomatically"
+    ].filter(setting => this.settings[setting] != true);
 
     if(overwriteBotFunctions.length > 0) {
-        console.log(`WARNING: ${overwriteBotFunctions.map(setting => `"${setting}"`).join(' & ')} does require "overwriteBotFunctions" to be enabled!`);
+        console.log(`WARNING: ${overwriteBotFunctions.map((setting, i) => `"${setting}"`).join(i+1 == overwriteBotFunctions.length ? ' & ' : ', ')} does require "overwriteBotFunctions" to be enabled!`);
     }
 }
 
 /**
  * Save Add-Ons settings
+ * @param DBM Discord Bot Maker
  */
 AddOns.saveSettings = function(DBM) {
     DBM.Files.saveData('settings');
@@ -148,6 +158,7 @@ AddOns.loadAutoPlay = function() {
 
 /**
  * Save AutoPlay data
+ * @param autoplay AutoPlay data
  */
 AddOns.saveAutoPlay = function(autoplay) {
     var autoplaypath = path.join(process.cwd(), "data", "autoplay.json");
@@ -223,6 +234,7 @@ AddOns.loadPrefixes = function() {
 
 /**
  * Save Prefixes
+ * @param prefix Prefixes
  */
 AddOns.savePrefixes = function(prefixes) {
     var prefixespath = path.join(process.cwd(), "data", "prefixes.json");
@@ -263,7 +275,11 @@ AddOns.installNodeModule = function(nodeModuleName) {
         child_process.execSync(`npm i ${nodeModuleName} --save`, {cwd: process.cwd(), stdio:[0,1,2]});
     } catch(e) {};
 
-    return this.checkNodeModule(nodeModuleName) ? require(nodeModuleName) : null;
+    if(this.checkNodeModule(nodeModuleName)) {
+        return require(nodeModuleName);
+    } else {
+        return null;
+    }
 }
 
 /**
@@ -272,10 +288,10 @@ AddOns.installNodeModule = function(nodeModuleName) {
  * @returns Object
  */
 AddOns.require = function(nodeModuleName) {
-    if(!this.checkNodeModule(nodeModuleName)) {
-        this.installNodeModule(nodeModuleName);
-    } else {
+    if(this.checkNodeModule(nodeModuleName)) {
         return require(nodeModuleName);
+    } else {
+        return this.installNodeModule(nodeModuleName);
     }
 }
 
